@@ -1,0 +1,73 @@
+﻿@model SurveyApp.ViewModels.ResultsViewModel
+@{
+    ViewData["Title"] = "Wyniki";
+}
+
+<h2>Wyniki ankiety: @Model.Survey.Title</h2>
+<p>@Model.Survey.Description</p>
+<hr />
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+@if (!Model.HasVoted)
+{
+    <div class="alert alert-warning">
+        Nie oddałeś› jeszcze głosu w tej ankiecie. 
+        <a asp-action="Vote" asp-route-id="@Model.Survey.Id" class="alert-link">Przejdłş do głosowania</a>
+    </div>
+}
+
+<div style="width: 80%; margin: auto;">
+    <canvas id="resultsChart"></canvas>
+</div>
+
+<div class="mt-4">
+    <h4>Szczegółowe statystyki:</h4>
+    <ul class="list-group">
+        @foreach (var item in Model.OptionVotes)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                @item.Key
+                <span class="badge bg-primary rounded-pill">@item.Value głosów</span>
+            </li>
+        }
+    </ul>
+    <p class="mt-2"><b>Suma głosów: @Model.TotalVotes</b></p>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('resultsChart').getContext('2d');
+        
+        const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.OptionVotes.Keys));
+        const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.OptionVotes.Values));
+
+        const resultsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Liczba głosów',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

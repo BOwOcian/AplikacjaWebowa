@@ -1,0 +1,22 @@
+﻿@model SurveyApp.Models.Survey
+@{
+    ViewData["Title"] = "Głosowanie";
+}
+
+<h2>@Model.Title</h2>
+<p>@Model.Description</p>
+<hr />
+
+<form asp-action="Vote" method="post">
+    <input type="hidden" name="surveyId" value="@Model.Id" />
+    <div class="list-group">
+        @foreach (var option in Model.Options)
+        {
+            <label class="list-group-item">
+                <input type="radio" name="optionId" value="@option.Id" required /> @option.Text
+            </label>
+        }
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Oddaj głos</button>
+    <a asp-action="Index" class="btn btn-link mt-3">Wróćć do listy</a>
+</form>

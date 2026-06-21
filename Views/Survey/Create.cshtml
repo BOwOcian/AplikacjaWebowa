@@ -1,0 +1,56 @@
+﻿@model SurveyApp.ViewModels.CreateSurveyViewModel
+@{
+    ViewData["Title"] = "Utwórz ankietę";
+}
+
+<h2>Utwórz nową ankietę</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group mt-3">
+        <label asp-for="Title">Tytuł</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-3">
+        <label asp-for="Description">Opis (opcjonalnie)</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group mt-3" id="options-container">
+        <label>Opcje odpowiedzi</label>
+        @for (int i = 0; i < Model.Options.Count; i++)
+        {
+            <input type="text" name="Options[@i]" value="@Model.Options[i]" class="form-control mb-2" placeholder="Opcja @(i + 1)" required />
+        }
+    </div>
+
+    <button type="button" id="btnAddOption" class="btn btn-secondary btn-sm mb-3">+ Dodaj opcję</button>
+
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-success">Zapisz ankietę</button>
+        <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let optionIndex = @Model.Options.Count;
+            const container = document.getElementById('options-container');
+            const btn = document.getElementById('btnAddOption');
+
+            if (btn) {
+                btn.addEventListener("click", function () {
+                    const newInput = document.createElement('input');
+                    newInput.type = 'text';
+                    newInput.name = 'Options[' + optionIndex + ']';
+                    newInput.className = 'form-control mb-2';
+                    newInput.placeholder = 'Opcja ' + (optionIndex + 1);
+                    newInput.required = true;
+                    container.appendChild(newInput);
+                    optionIndex++;
+                });
+            }
+        });
+    </script>
+}
